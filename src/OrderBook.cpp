@@ -23,23 +23,17 @@ void OrderBook::processL2Snapshot(const std::string& data, Timestamp timestamp) 
 
     // should start with BID
     ss >> token;
-    //std::cout << timestamp << " [L2] Bids: ";
     while (ss >> token && token != "ASK") {
         Price price = std::stod(token);
         ss >> qty;
-        //std::cout << qty << "@" << price << " ";
         l2Book->addBidLevel(price, qty);
     }
 
-    //std:: cout << ", Asks: ";
     while (ss >> token) {
         Price price = std::stod(token);
         ss >> qty;
-        //std::cout << qty << "@" << price << " ";
         l2Book->addAskLevel(price, qty);
     }
-
-    //std::cout << "\n";
 
     handleL2BidChange(price, timestamp);
     handleL2AskChange(price, timestamp);
@@ -48,7 +42,6 @@ void OrderBook::processL2Snapshot(const std::string& data, Timestamp timestamp) 
 void OrderBook::handleL2BidChange(Price price, Timestamp timestamp) {
     auto& l3Bids = smartBook.getBids();
     for (const auto& [price, l2Level] : l2Book->getBids()) {
-        std::cout << "[L2] " << price << ": Qty: " << l2Level.quantity << std::endl;
 
         auto it = l3Bids.find(price);
         if (it == l3Bids.end()) {
@@ -57,7 +50,6 @@ void OrderBook::handleL2BidChange(Price price, Timestamp timestamp) {
         } else if (l2Level.quantity > it->second.quantity) {
             guessNewOrder(price, l2Level.quantity - it->second.quantity, false, false, timestamp, true);
         } else if (it->second.quantity > l2Level.quantity){
-            std::cout << "[L3] " << it->first << ": Qty: " << it->second.quantity << std::endl;
             guessOrderReduction(price, it->second.quantity - l2Level.quantity, false, timestamp);
         }
     }
@@ -77,7 +69,6 @@ void OrderBook::handleL2BidChange(Price price, Timestamp timestamp) {
 void OrderBook::handleL2AskChange(Price price, Timestamp timestamp) {
     auto& l3Asks = smartBook.getAsks();
     for (const auto& [price, l2Level] : l2Book->getAsks()) {
-        std::cout << "[L2] " << price << ": Qty: " << l2Level.quantity << std::endl;
 
         auto it = l3Asks.find(price);
         if (it == l3Asks.end()) {
@@ -86,7 +77,6 @@ void OrderBook::handleL2AskChange(Price price, Timestamp timestamp) {
         } else if (l2Level.quantity > it->second.quantity) {
             guessNewOrder(price, l2Level.quantity - it->second.quantity, true, false, timestamp, true);
         } else if (it->second.quantity > l2Level.quantity){
-            std::cout << "[L3] " << it->first << ": Qty: " << it->second.quantity << std::endl;
             guessOrderReduction(price, it->second.quantity - l2Level.quantity, true, timestamp);
         }
     }
@@ -282,12 +272,9 @@ bool OrderBook::reconcileCancel(OrderId orderId) {
 }
 
 bool OrderBook::reconcileTrade(Price price, Quantity quantity) {
-    std::cout << "GuessedExecutions: " << guessedExecutions.size() << std::endl;
-    std::cout << "guesses " << guesses.size() << std::endl;
     while (!guessedExecutions.empty()) {
         OrderInfo* exec = guessedExecutions.front();
         guessedExecutions.pop();
-        std::cout << "exec " << exec->orderId << std::endl;
         auto it = guesses.find(exec->orderId);
         if (it == guesses.end()) continue;
 
@@ -320,7 +307,6 @@ bool OrderBook::reconcileTrade(Price price, Quantity quantity) {
 
     for (auto it = guesses.begin(); it != guesses.end(); ) {
         OrderInfo& guess = it->second;
-        std::cout << " found guess " << guess.price << " " << guess.originalQty << " " << guess.size << std::endl;
         if ((guess.action == "MODIFY" && quantity == guess.originalQty - guess.size
             || guess.action == "CANCEL" && quantity == guess.size) &&
             guess.isGuess &&
@@ -363,7 +349,6 @@ void OrderBook::guessNewOrder(Price price, Quantity size, bool isSell, bool isMa
 
 void OrderBook::onExecution(Price price, Quantity quantity, Timestamp timestamp, bool isGuess) {
     auto [isMarketable, isSellAggressor] = deduceIsSellAggressor(price);
-    std::cout << "[deduceIsSellAggressor]: isMarketable: " << isMarketable << " isSell: " << isSellAggressor << std::endl;
 
     // guess there is an aggressive order
     guessNewOrder(price, quantity, isSellAggressor, true, timestamp);
@@ -377,7 +362,6 @@ void OrderBook::onExecution(Price price, Quantity quantity, Timestamp timestamp,
         if (isGuess) {
             guessedExecutions.push(&it->second);
         }
-        std::cout << "[GUESS] Insert guess for order " << exec.orderId << " - " << exec.action << std::endl;
         onOrderExecution(*this, exec);
     }
 }
