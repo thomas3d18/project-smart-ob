@@ -19,14 +19,14 @@ This project implements:
 
 The following market data format is assumed:
 - L2 Full snapshots
-    - <timestamp> BID <bid_0 price> <bid_0 size> ... <bid_n price> <bid_n size> ASK <ask_0 price> <ask_0 size> ... <ask_n price> <ask_n size>
+    - ```<timestamp> BID <bid_0 price> <bid_0 size> ... <bid_n price> <bid_n size> ASK <ask_0 price> <ask_0 size> ... <ask_n price> <ask_n size>```
     - L2 order book is assumed to not be crossed at all times
 - L3 order updates
-    - <timestamp> <ADD> <order id> <side> <price> <size>
-    - <timestamp> <MODIFY> <order id> <side> <price> <size>
-    - <timestamp> <CANCEL> <order id>
+    - ```<timestamp> <ADD> <order id> <side> <price> <size>```
+    - ```<timestamp> <MODIFY> <order id> <side> <price> <size>```
+    - ```<timestamp> <CANCEL> <order id>```
 - Trade execution
-    - <timestamp> <price> <size>
+    - ```<timestamp> <price> <size>```
 - To demonstrate the guessing/reconciliation logic, minimal information is assumed for L3 order and trade execution updates. For instance, there are no execution updates in L3 and no aggressor side or order id is provided in trade updates.
 - While different market feeds may become unsynchronized, updates within the same stream is assumed to be in correct sequence. We also assume no data loss or ill formed data in market data feeds, such that each order book action can be validated by a subsequent update. (e.g. A Trade update will always be followed by a MODIFY/CANCEL, albeit timing differences)
 
