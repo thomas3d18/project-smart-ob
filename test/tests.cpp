@@ -188,7 +188,7 @@ void test_L2_leads_favour_execution_guess_trade_lags_valid() {
     ob.processL3Update("MODIFY 1 BUY 100.0 300", 5);
 
     // Lagged trade update validates guess
-    ob.processTrade("100.0 200", 4);
+    ob.processTrade("100.0 200", 10);
 
     // L3 book remains the same
     ASSERT_EQ(ob.getSmartOrderBook().getTopBids(1).begin()->price, 100.0);
@@ -196,15 +196,15 @@ void test_L2_leads_favour_execution_guess_trade_lags_valid() {
     ASSERT_EQ(ob.getSmartOrderBook().getTopBids(1).begin()->quantity, 300.0);
 
     // Entire bid gets hit
-    ob.processL2Snapshot("BID ASK 101.0 500", 3);
+    ob.processL2Snapshot("BID ASK 101.0 500", 11);
 
     ASSERT_TRUE(ob.getSmartOrderBook().getTopBids(1).empty());
 
     // L3 arrives afterwards
-    ob.processL3Update("CANCEL 1", 6);
+    ob.processL3Update("CANCEL 1", 12);
 
     // Lagged trade update validates guess
-    ob.processTrade("100.0 300", 5);
+    ob.processTrade("100.0 300", 13);
 
     // All guesses are validated
     ASSERT_EQ(ob.getGuesses().size(), 0);
@@ -247,15 +247,15 @@ void test_L2_leads_favour_execution_guess_l3_lags_valid() {
     ASSERT_EQ(ob.getSmartOrderBook().getTopBids(1).begin()->quantity, 300.0);
 
     // Entire bid gets hit
-    ob.processL2Snapshot("BID ASK 101.0 500", 3);
+    ob.processL2Snapshot("BID ASK 101.0 500", 10);
 
     ASSERT_TRUE(ob.getSmartOrderBook().getTopBids(1).empty());
 
     // Trade update validates guess
-    ob.processTrade("100.0 300", 5);
+    ob.processTrade("100.0 300", 11);
 
     // L3 lags behind
-    ob.processL3Update("CANCEL 1", 6);
+    ob.processL3Update("CANCEL 1", 12);
 
     // All guesses are validated
     ASSERT_EQ(ob.getGuesses().size(), 0);
@@ -396,13 +396,13 @@ int main() {
     suite.addTest("Trade leads L3 update SELL aggressive", test_trade_leads_L3_sell_aggressive);
     suite.addTest("Trade leads L3 update BUY aggressive", test_trade_leads_L3_buy_aggressive);
     suite.addTest("Trade leads L3 update with partial fills", test_trade_leads_L3_partial_fill);
-    suite.addTest("L2 Snaphot Leads (Always guesses execution) - Trade lags valid", test_L2_leads_favour_execution_guess_trade_lags_valid);
-    suite.addTest("L2 Snaphot Leads (Always guesses execution) - L3 lags valid", test_L2_leads_favour_execution_guess_l3_lags_valid);
-    suite.addTest("L2 Snapshot Leads (Always gusses execution) - Wrong guess", test_L2_leads_favour_execution_guess_invalid);
-    suite.addTest("L2 Snapshot Leads (Guess modify/cancel) - Valid", test_L2_leads_guess_modify_valid);
-    suite.addTest("L2 Snapshot Leads (Guess modify/cancel) - Invalid", test_L2_leads_guess_modify_invalid);
-    suite.addTest("L2 Snapshot Leads Add", test_L2_leads_added_qty);
-    suite.addTest("L2 Snapshot Leads Add Invalid", test_L2_leads_added_qty_invalid);
+    suite.addTest("L2 Leads (P(Execute)=1) - Trade lags valid", test_L2_leads_favour_execution_guess_trade_lags_valid);
+    suite.addTest("L2 Leads (P(Execute)=1) - L3 lags valid", test_L2_leads_favour_execution_guess_l3_lags_valid);
+    suite.addTest("L2 Leads (P(Execute)=1) - Wrong guess", test_L2_leads_favour_execution_guess_invalid);
+    suite.addTest("L2 Leads (P(Execute)=0) - Valid", test_L2_leads_guess_modify_valid);
+    suite.addTest("L2 Leads (P(Execute)=0) - Invalid", test_L2_leads_guess_modify_invalid);
+    suite.addTest("L2 Leads Add", test_L2_leads_added_qty);
+    suite.addTest("L2 Leads Add Invalid", test_L2_leads_added_qty_invalid);
 
     suite.run();
     return 0;
