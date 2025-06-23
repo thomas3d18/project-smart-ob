@@ -160,7 +160,7 @@ void test_trade_leads_L3_partial_fill() {
     ASSERT_EQ(ob.getGuesses().size(), 0);
 }
 
-void test_L2_leads_favour_execution_guess_trade_lags_valid() {
+void test_L3_leads_trade_execution_guess() {
     L2Book l2;
     L3Book l3;
     TradeContainer trades;
@@ -210,7 +210,7 @@ void test_L2_leads_favour_execution_guess_trade_lags_valid() {
     ASSERT_EQ(ob.getGuesses().size(), 0);
 }
 
-void test_L2_leads_favour_execution_guess_l3_lags_valid() {
+void test_trade_leads_L3_execution_guess() {
     L2Book l2;
     L3Book l3;
     TradeContainer trades;
@@ -261,7 +261,7 @@ void test_L2_leads_favour_execution_guess_l3_lags_valid() {
     ASSERT_EQ(ob.getGuesses().size(), 0);
 }
 
-void test_L2_leads_favour_execution_guess_invalid() {
+void test_L3_leads_trade_execution_guess_invalid() {
     L2Book l2;
     L3Book l3;
     TradeContainer trades;
@@ -396,9 +396,9 @@ int main() {
     suite.addTest("Trade leads L3 update SELL aggressive", test_trade_leads_L3_sell_aggressive);
     suite.addTest("Trade leads L3 update BUY aggressive", test_trade_leads_L3_buy_aggressive);
     suite.addTest("Trade leads L3 update with partial fills", test_trade_leads_L3_partial_fill);
-    suite.addTest("L2 Leads (P(Execute)=1) - Trade lags valid", test_L2_leads_favour_execution_guess_trade_lags_valid);
-    suite.addTest("L2 Leads (P(Execute)=1) - L3 lags valid", test_L2_leads_favour_execution_guess_l3_lags_valid);
-    suite.addTest("L2 Leads (P(Execute)=1) - Wrong guess", test_L2_leads_favour_execution_guess_invalid);
+    suite.addTest("L3 leads Trade (P(Execute)=1)", test_L3_leads_trade_execution_guess);
+    suite.addTest("Trade leads L3 (P(Execute)=1)", test_trade_leads_L3_execution_guess);
+    suite.addTest("L2 leads Trade (P(Execute)=1) - Wrong guess", test_L3_leads_trade_execution_guess_invalid);
     suite.addTest("L2 Leads (P(Execute)=0) - Valid", test_L2_leads_guess_modify_valid);
     suite.addTest("L2 Leads (P(Execute)=0) - Invalid", test_L2_leads_guess_modify_invalid);
     suite.addTest("L2 Leads Add", test_L2_leads_added_qty);
